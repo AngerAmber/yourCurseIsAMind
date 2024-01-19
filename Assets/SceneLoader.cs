@@ -13,7 +13,10 @@ public class SceneLoader : MonoBehaviour
     public void MoveCamera(float Move)
     {
         Vector3 camPos = Camera.main.transform.position;
-        camPos.x = Move;
+        if (Move > 0) 
+        {
+            camPos.x = Move; 
+        }
         gameObject.transform.position = camPos;
     }
 }

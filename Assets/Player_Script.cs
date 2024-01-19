@@ -25,7 +25,8 @@ public class Player_Script : MonoBehaviour
     public void JumpGround() { myAnimator.SetFloat("JumpState", 0); }
     public void JumpAir() { myAnimator.SetFloat("JumpState", 1); }
     public void JumpUpdate() { myAnimator.SetFloat("JumpState", 2); }
-
+    public void VelocityCheck() { myAnimator.SetFloat("Velocity", Mathf.Abs(myRigidbody.velocity.x)); }
+    public void InvincibilityCheck() { myAnimator.SetFloat("Immunity", immunity); }
     //Components
     public Transform target;
     [SerializeField] Camera myCamera;
@@ -78,17 +79,18 @@ public class Player_Script : MonoBehaviour
             {
                 TakeDamage(10);
                 Vector3 characterVelocity = myRigidbody.velocity;
-                characterVelocity.y += 10;
+                characterVelocity.y = 50;
                 myRigidbody.velocity = characterVelocity;
             }
-            if (collision.gameObject.tag == "Coin")
+            if (collision.gameObject.tag == "Lemon")
             {
             pointCounter += 1;
             }
     }
+
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Ground" && jumpState != CharacterState.Jumping)
+        if (collision.gameObject.tag == "Ground" && Input.GetKey(KeyCode.Space) == false)
         {
             jumpState = CharacterState.Airborn;
         }
@@ -136,6 +138,7 @@ public class Player_Script : MonoBehaviour
     {
         cameraMovePos = gameObject.transform.position.x;
         cameraScript.MoveCamera(cameraMovePos);
+        VelocityCheck();
 
         timeScale = Time.deltaTime * 1;
         //Counts frames but is turned of for now.
@@ -174,6 +177,7 @@ public class Player_Script : MonoBehaviour
             //Counts how far you jumped.
             maximumJump = maximumJump - 300 * Time.deltaTime;
             OnJump();
+            myRigidbody.gravityScale = 3;
             //Pushes you up acounting for the accelleration of the player.
             Vector3 characterPosition = gameObject.transform.position;
             Vector3 characterVelocity = myRigidbody.velocity;
@@ -191,24 +195,17 @@ public class Player_Script : MonoBehaviour
         //Debugging code for making the player not stop a jump prematurelly.
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            if (maximumJump > 250)
-            {
-                jumpState = CharacterState.Grounded;
-                Debug.Log("Stop");
-            }
-            else
-            {
-                Debug.Log("Jump!");
-                jumpState = CharacterState.Airborn;
-                OfJump();
-            }
+
+            Debug.Log("Jump!");
+            jumpState = CharacterState.Airborn;
+            OfJump();
+            
         }
 
         //If on ground reset jump.
         if (jumpState == CharacterState.Grounded)
         {
             maximumJump = 300f;
-            myRigidbody.gravityScale = 3;
             OfJump();
         }
 
@@ -244,6 +241,7 @@ public class Player_Script : MonoBehaviour
         if (Input.GetKey(KeyCode.Escape))
         {
             Reset();
+            cameraScript.LoadScene("GameOver");
         }
         
         if (jumpState == CharacterState.Airborn)

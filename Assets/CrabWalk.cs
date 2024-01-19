@@ -15,5 +15,11 @@ public class CrabWalk : MonoBehaviour
         characterVelocity -= MovementSign * MovementSpeedPerSecond * transform.right.normalized;
         myRigidBody.velocity = characterVelocity;
     }
-
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            Destroy(gameObject);
+        }
+    }
 }
